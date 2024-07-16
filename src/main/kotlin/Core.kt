@@ -28,23 +28,23 @@ public  fun decodeMessage(message: List<Byte>, password: String) =
     transformBits(message, password).joinToString("").chunked(8).map { it.toInt(2).toChar() }.joinToString("")
 
 public fun steganographyEncoder(image: BufferedImage, message_with_pwd_and_end_bits:  List<Byte>): BufferedImage {
-    val copyImage = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_RGB)
+//    val copyImage = BufferedImage(image.width, image.height, BufferedImage.TYPE_INT_RGB)//FIXME can not use copy will let Encoder image fail !!
     var index = 0
-    start@ for (y in 0 until copyImage.height) {
-        for (x in 0 until copyImage.width) {
+    start@ for (y in 0 until image.height) {
+        for (x in 0 until image.width) {
             if (index == message_with_pwd_and_end_bits.size) break@start
             val bit = message_with_pwd_and_end_bits[index++].toInt()
-            val color = Color(copyImage.getRGB(x, y)).let {
+            val color = Color(image.getRGB(x, y)).let {
                 Color(
                     it.red,
                     it.green,
                     it.blue.and(254).or(bit)
                 )
             }
-            copyImage.setRGB(x, y, color.rgb)
+            image.setRGB(x, y, color.rgb)
         }
     }
-    return copyImage
+    return image
 }
 
 public fun steganographyDecoder(image: BufferedImage,password: String) :String {
